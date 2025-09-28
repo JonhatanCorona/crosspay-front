@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import React from "react";
 
 type CardPreviewProps = {
@@ -60,9 +59,11 @@ export default function CardPreview({
           }}
         >
           <div className="flex justify-between items-center">
-            <Image src={crosspayLogoSrc} alt="Crosspay logo" className="h-6 w-auto" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={crosspayLogoSrc} alt="Crosspay logo" className="h-6 w-auto" />
             {typeLogoSrc && (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={typeLogoSrc}
                 alt={`${detectedType} logo`}
                 className="h-10 w-auto"
@@ -106,7 +107,8 @@ export default function CardPreview({
             </div>
           </div>
           <div className="self-end">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/crosspay-solutions-logo-blanco.svg" // ruta de tu logo
             alt="Crosspay Logo"
             className="h-6 w-auto"
