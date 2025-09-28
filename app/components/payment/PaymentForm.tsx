@@ -50,6 +50,7 @@ export default function PaymentForm() {
   formData.amount &&
   !isNaN(amountNumber) &&
   amountNumber > 0 &&
+  formData.description &&
   formData.name &&
   formData.cardNumber.replace(/\s/g, "").length === 16 &&
   formData.expiry.length === 5 && 
