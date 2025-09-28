@@ -5,7 +5,7 @@ import CardPreview from "./CardPreview";
 import { formatCardNumber, formatExpiry } from "../../utils/card-utils";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { sendPayment } from "@/helpers/paymentHelper-api";
+import { sendPayment } from "@/helpers/payment-api";
 
 type FormData = {
   currency: string;

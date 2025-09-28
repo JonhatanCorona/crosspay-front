@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { login } from "@/helpers/loginhelper-api";
+import { login } from "@/helpers/login-api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -15,17 +15,12 @@ export default function LoginForm() {
     e.preventDefault();
     try {
       const result = await login({ email, password });
-
-      // 🔍 Ver lo que retorna
-      console.log("Resultado del login:", result);
-
       if (result?.access_token) {
         // Guardar en localStorage
         localStorage.setItem("authToken", result.access_token);
         localStorage.setItem("expiresIn", result.expiresIn.toString());
 
         toast.success("✅ Bienvenido administrador");
-
         // Redirigir al dashboard de admin
         router.push("/admin");
       } else {
