@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import CardPreview from "./CardPreview";
-import { formatCardNumber, formatExpiry } from "../../utils/card-utils";
+import { formatCardNumber, formatExpiry, isExpiryValid } from "../../utils/card-utils";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { sendPayment } from "@/helpers/payment-api";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   currency: string;
@@ -19,6 +20,8 @@ type FormData = {
 };
 
 export default function PaymentForm() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<FormData>({
     currency: "",
     amount: "",
@@ -31,13 +34,31 @@ export default function PaymentForm() {
   });
 
   const [showCardBack, setShowCardBack] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === "cardNumber") return setFormData((s) => ({ ...s, cardNumber: formatCardNumber(value) }));
-    if (name === "expiry") return setFormData((s) => ({ ...s, expiry: formatExpiry(value) }));
-    if (name === "cvc") return setFormData((s) => ({ ...s, cvc: value.replace(/\D/g, "").slice(0, 4) }));
-    if (name === "amount") return setFormData((s) => ({ ...s, amount: value.replace(/^-/, "") }));
+
+    if (name === "cardNumber") {
+      setFormData((s) => ({ ...s, cardNumber: formatCardNumber(value) }));
+      return;
+    }
+
+    if (name === "expiry") {
+      setFormData((s) => ({ ...s, expiry: formatExpiry(value) }));
+      return;
+    }
+
+    if (name === "cvc") {
+      setFormData((s) => ({ ...s, cvc: value.replace(/\D/g, "").slice(0, 4) }));
+      return;
+    }
+
+    if (name === "amount") {
+      setFormData((s) => ({ ...s, amount: value.replace(/^-/, "") }));
+      return;
+    }
+
     setFormData((s) => ({ ...s, [name]: value }));
   };
 
@@ -52,11 +73,12 @@ export default function PaymentForm() {
     formData.description &&
     formData.name &&
     formData.cardNumber.replace(/\s/g, "").length === 16 &&
-    formData.expiry.length === 5 &&
+    isExpiryValid(formData.expiry) &&
     formData.cvc.length >= 3;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       await sendPayment(formData);
@@ -72,12 +94,16 @@ export default function PaymentForm() {
         expiry: "",
         cvc: "",
       });
+
+      router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error("❌ Error al procesar el pago: " + error.message);
       } else {
         toast.error("❌ Error desconocido");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,7 +128,10 @@ export default function PaymentForm() {
 
         {/* Formulario */}
         <div className="w-full max-w-lg p-4 rounded-xl shadow-md" style={{ backgroundColor: "var(--bg-sec)" }}>
-          <h2 className="text-xl font-bold mb-3 border-b pb-1 text-center" style={{ color: "var(--titles)" }}>
+          <h2
+            className="text-xl font-bold mb-3 border-b pb-1 text-center"
+            style={{ color: "var(--titles)" }}
+          >
             Detalles de Pago 💳
           </h2>
 
@@ -217,11 +246,21 @@ export default function PaymentForm() {
                   placeholder="MM/AA"
                   maxLength={5}
                   autoComplete="cc-exp"
-                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                  className={`w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 transition ${
+                    formData.expiry && !isExpiryValid(formData.expiry)
+                      ? "border-red-500 focus:ring-red-500"
+                      : "border-[var(--line)] focus:ring-[var(--accent1)]"
+                  }`}
+                  style={{ backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
                   required
                 />
+                {formData.expiry && !isExpiryValid(formData.expiry) && (
+                  <p className="text-red-500 text-[9px] mt-1">
+                    Fecha de vencimiento inválida o ya vencida
+                  </p>
+                )}
               </div>
+
               <div>
                 <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
                   CVV
@@ -262,14 +301,35 @@ export default function PaymentForm() {
             {/* Botón */}
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || loading}
               className={`w-full p-2.5 text-xs rounded-xl font-semibold shadow-sm transform hover:scale-105 transition-all duration-200
-              ${isFormValid
-                ? "bg-[var(--accent1)] hover:shadow-md text-[var(--bg-sec)]"
-                : "bg-gray-400 cursor-not-allowed shadow-none text-[var(--bg-sec)]"
-              }`}
+                ${isFormValid && !loading
+                  ? "bg-[var(--accent1)] hover:shadow-md text-[var(--bg-sec)]"
+                  : "bg-gray-400 cursor-not-allowed shadow-none text-[var(--bg-sec)]"
+                }`}
             >
-              Pagar
+              {loading ? (
+                <div className="flex justify-center items-center gap-1">
+                  <span>Cargando</span>
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={i}
+                      className="text-xs"
+                      animate={{ y: ["0%", "-50%", "0%"] }}
+                      transition={{
+                        duration: 0.6,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      .
+                    </motion.span>
+                  ))}
+                </div>
+              ) : (
+                "Pagar"
+              )}
             </button>
           </form>
         </div>

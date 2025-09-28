@@ -22,5 +22,4 @@ export async function fetchTransactions(token: string): Promise<Transaction[]> {
   }
 
   return await res.json();
-
 }

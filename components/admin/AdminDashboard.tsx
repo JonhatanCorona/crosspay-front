@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { fetchTransactions, Transaction } from "@/helpers/adminTransaccion.api";
+import Cookies from "js-cookie"; 
 
 export default function AdminDashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.clear();
+    Cookies.remove("authToken");
     toast.success("¡Sesión cerrada con éxito!");
     router.push("/login");
   };
@@ -56,18 +58,22 @@ export default function AdminDashboard() {
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <img src="/crosspay-solutions-logo-color.svg" alt="Crosspay Logo" className="h-16 w-auto" />
+        <img 
+          src="/crosspay-solutions-logo-color.svg" 
+          alt="Crosspay Logo" 
+          className="h-16 w-auto" 
+        />
         <motion.button
           onClick={handleLogout}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="bg-[var(--accent1)] hover:bg-[var(--accent3)] text-[var(--bg-sec)] font-bold py-2 px-4 rounded-lg shadow-lg transition-all"
+          className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold shadow-md text-[var(--bg-sec)] bg-[var(--accent2)] hover:bg-[var(--accent3)] transition-all duration-300"
         >
-            Cerrar Sesión
+          Cerrar Sesión
         </motion.button>
       </div>
 
-      {/* Título centrado */}
+      {/* Título */}
       <h1 className="text-3xl font-bold text-center mb-6" style={{ color: "var(--titles)" }}>
         Panel de Administrador
       </h1>
@@ -97,9 +103,11 @@ export default function AdminDashboard() {
 
       {/* Tabla */}
       {loading ? (
-        <p className="text-center text-3xl font-semibold mt-20 animate-pulse"
-          style={{ color: "var(--accent1)" }}>
-  Cargando transacciones...
+        <p 
+          className="text-center text-3xl font-semibold mt-20 animate-pulse"
+          style={{ color: "var(--accent1)" }}
+        >
+          Cargando transacciones...
         </p>
       ) : (
         <div className="overflow-x-auto">
@@ -131,24 +139,12 @@ export default function AdminDashboard() {
                     transition={{ delay: index * 0.03 }}
                     className="border-b hover:bg-[var(--bg-sec)] transition-colors"
                   >
-                    <td className="px-3 py-2 text-sm font-medium" style={{ color: "var(--titles)" }}>
-                      {t.id}
-                    </td>
-                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
-                      {t.currency}
-                    </td>
-                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
-                      {t.amount}
-                    </td>
-                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
-                      {t.description}
-                    </td>
-                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
-                      {t.name}
-                    </td>
-                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
-                      {t.documentType}
-                    </td>
+                    <td className="px-3 py-2 text-sm font-medium" style={{ color: "var(--titles)" }}>{t.id}</td>
+                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>{t.currency}</td>
+                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>{t.amount}</td>
+                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>{t.description}</td>
+                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>{t.name}</td>
+                    <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>{t.documentType}</td>
                     <td className="px-3 py-2 text-sm" style={{ color: "var(--titles)" }}>
                       {new Date(t.createdAt).toLocaleString()}
                     </td>
