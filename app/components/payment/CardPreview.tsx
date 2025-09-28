@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React from "react";
 
 type CardPreviewProps = {
@@ -43,6 +44,7 @@ export default function CardPreview({
 
   return (
     <div className="w-full max-w-[400px] aspect-[16/10] perspective">
+
       <div
         className={`relative w-full h-full transition-transform duration-700 ease-in-out transform-style preserve-3d ${
           isFlipped ? "rotate-y-180" : ""
@@ -58,9 +60,9 @@ export default function CardPreview({
           }}
         >
           <div className="flex justify-between items-center">
-            <img src={crosspayLogoSrc} alt="Crosspay logo" className="h-6 w-auto" />
+            <Image src={crosspayLogoSrc} alt="Crosspay logo" className="h-6 w-auto" />
             {typeLogoSrc && (
-              <img
+              <Image
                 src={typeLogoSrc}
                 alt={`${detectedType} logo`}
                 className="h-10 w-auto"
@@ -104,7 +106,7 @@ export default function CardPreview({
             </div>
           </div>
           <div className="self-end">
-          <img
+          <Image
             src="/crosspay-solutions-logo-blanco.svg" // ruta de tu logo
             alt="Crosspay Logo"
             className="h-6 w-auto"

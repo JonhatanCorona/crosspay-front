@@ -59,7 +59,7 @@ export default function PaymentForm() {
   e.preventDefault();
 
   try {
-    const result = await sendPayment(formData);
+    await sendPayment(formData);
     toast.success("✅ Pago registrado con éxito!");
 
     setFormData({
@@ -72,9 +72,13 @@ export default function PaymentForm() {
       expiry: "",
       cvc: "",
     });
-  } catch (error: any) {
-    alert("Error al procesar el pago: " + error.message);
+  } catch (error: unknown) {
+  if (error instanceof Error) {
+    toast.error("❌ Error al procesar el pago: " + error.message);
+  } else {
+    toast.error("❌ Error desconocido");
   }
+}
 };
 
   return (
