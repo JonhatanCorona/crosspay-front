@@ -1,4 +1,4 @@
-import PaymentForm from "@/app/components/payment/PaymentForm";
+import PaymentForm from "@/components/payment/PaymentForm";
 
 
 export default function PaymentPage() {
