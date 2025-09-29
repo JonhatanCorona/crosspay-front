@@ -147,6 +147,7 @@ export default function LoginForm() {
       <footer className="py-4 border-t flex flex-col items-center gap-2 text-xs mt-auto"
               style={{ borderColor: "var(--line)", color: "var(--titles)" }}>
         <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src="/crosspay-solutions-logo-color.svg" 
             alt="Crosspay Solutions" 
