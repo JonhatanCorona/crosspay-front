@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { sendPayment } from "@/helpers/payment-api";
 import { useRouter } from "next/navigation";
+import { Lock, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 type FormData = {
   currency: string;
@@ -108,232 +110,267 @@ export default function PaymentForm() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="flex flex-col lg:flex-row items-start lg:items-center justify-center p-3 bg-[var(--bg-ppal)] gap-3 lg:gap-6 min-h-screen"
-    >
-      <div className="w-full max-w-6xl grid gap-4 grid-cols-1 lg:grid-cols-2 items-center">
-        {/* Tarjeta */}
-        <div className="flex items-center justify-center">
-          <CardPreview
-            cardNumber={formData.cardNumber}
-            cardHolder={formData.name}
-            expiry={formData.expiry}
-            cvc={formData.cvc}
-            isFlipped={showCardBack}
-          />
-        </div>
+    <div className="flex flex-col min-h-screen bg-[var(--bg-ppal)]"> {/* Encabezado */} 
+    <header
+     className="flex flex-col items-center justify-center gap-2 py-6 border-b"
+     style={{ borderColor: "var(--line)" }}>
+    <Link href="/" className="cursor-pointer">
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img
+      src="/crosspay-solutions-logo-color.svg"
+      alt="Crosspay Solutions"
+      className="h-12 w-auto"
+    />
+    </Link>
 
-        {/* Formulario */}
-        <div className="w-full max-w-lg p-4 rounded-xl shadow-md" style={{ backgroundColor: "var(--bg-sec)" }}>
-          <h2
-            className="text-xl font-bold mb-3 border-b pb-1 text-center"
-            style={{ color: "var(--titles)" }}
-          >
-            Detalles de Pago 💳
-          </h2>
+  {/* Título */}
+  <h1 className="text-2xl font-bold text-[var(--titles)] text-center">
+    Pago Seguro con Crosspay Solutions
+  </h1>
+</header>
 
-          <form onSubmit={handleSubmit} className="space-y-2">
-            {/* Divisa */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Divisa
-              </label>
-              <select
-                name="currency"
-                value={formData.currency}
-                onChange={handleChange}
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                required
-              >
-                <option value="">Seleccione Divisa</option>
-                <option value="COP">COP</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
+      {/* Contenido principal */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex flex-col lg:flex-row items-start lg:items-center justify-center p-3 gap-3 lg:gap-6 flex-grow"
+      >
+        <div className="w-full max-w-6xl grid gap-4 grid-cols-1 lg:grid-cols-2 items-center">
+          {/* Tarjeta */}
+          <div className="flex items-center justify-center">
+            <CardPreview
+              cardNumber={formData.cardNumber}
+              cardHolder={formData.name}
+              expiry={formData.expiry}
+              cvc={formData.cvc}
+              isFlipped={showCardBack}
+            />
+          </div>
 
-            {/* Monto */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Monto
-              </label>
-              <input
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleChange}
-                placeholder="Ej: 100000.00"
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                required
-                min={0}
-                step="0.01"
-              />
-            </div>
+          {/* Formulario */}
+          <div className="w-full max-w-lg p-4 rounded-xl shadow-md" style={{ backgroundColor: "var(--bg-sec)" }}>
+            <h2
+              className="text-xl font-bold mb-3 border-b pb-1 text-center"
+              style={{ color: "var(--titles)" }}
+            >
+              Detalles de Pago 💳
+            </h2>
 
-            {/* Nombre */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Nombre
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-                  setFormData((s) => ({ ...s, name: value }));
-                }}
-                placeholder="Ej: JUAN PÉREZ"
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                required
-              />
-            </div>
-
-            {/* Tipo de documento */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Tipo de documento
-              </label>
-              <select
-                name="documentType"
-                value={formData.documentType}
-                onChange={handleChange}
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                required
-              >
-                <option value="">Seleccione documento</option>
-                <option value="Cédula">Cédula</option>
-                <option value="Pasaporte">Pasaporte</option>
-              </select>
-            </div>
-
-            {/* Número de tarjeta */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Número de tarjeta
-              </label>
-              <input
-                type="text"
-                name="cardNumber"
-                value={formData.cardNumber}
-                onChange={handleChange}
-                placeholder="XXXX XXXX XXXX XXXX"
-                maxLength={19}
-                autoComplete="cc-number"
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                required
-              />
-            </div>
-
-            {/* Fecha + CVV */}
-            <div className="grid grid-cols-3 gap-1">
-              <div className="col-span-2">
-                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                  Fecha de vencimiento (MM/AA)
-                </label>
-                <input
-                  type="text"
-                  name="expiry"
-                  value={formData.expiry}
-                  onChange={handleChange}
-                  placeholder="MM/AA"
-                  maxLength={5}
-                  autoComplete="cc-exp"
-                  className={`w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 transition ${
-                    formData.expiry && !isExpiryValid(formData.expiry)
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-[var(--line)] focus:ring-[var(--accent1)]"
-                  }`}
-                  style={{ backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-                  required
-                />
-                {formData.expiry && !isExpiryValid(formData.expiry) && (
-                  <p className="text-red-500 text-[9px] mt-1">
-                    Fecha de vencimiento inválida o ya vencida
-                  </p>
-                )}
-              </div>
-
+            <form onSubmit={handleSubmit} className="space-y-2">
+              {/* Divisa */}
               <div>
                 <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                  CVV
+                  Divisa
+                </label>
+                <select
+                  name="currency"
+                  value={formData.currency}
+                  onChange={handleChange}
+                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                  required
+                >
+                  <option value="">Seleccione Divisa</option>
+                  <option value="COP">COP</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+
+              {/* Monto */}
+              <div>
+                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                  Monto
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  placeholder="Ej: 100000.00"
+                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                  required
+                  min={0}
+                  step="0.01"
+                />
+              </div>
+
+              {/* Nombre */}
+              <div>
+                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                  Nombre
                 </label>
                 <input
                   type="text"
-                  name="cvc"
-                  value={formData.cvc}
-                  onChange={handleChange}
-                  onFocus={() => setShowCardBack(true)}
-                  onBlur={() => setShowCardBack(false)}
-                  placeholder="123"
-                  maxLength={4}
-                  autoComplete="cc-csc"
+                  name="name"
+                  value={formData.name}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+                    setFormData((s) => ({ ...s, name: value }));
+                  }}
+                  placeholder="Ej: JUAN PÉREZ"
                   className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
                   style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
                   required
                 />
               </div>
-            </div>
 
-            {/* Descripción */}
-            <div>
-              <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
-                Descripción
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Ej: Pago de servicios"
-                className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
-                style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
-              />
-            </div>
+              {/* Tipo de documento */}
+              <div>
+                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                  Tipo de documento
+                </label>
+                <select
+                  name="documentType"
+                  value={formData.documentType}
+                  onChange={handleChange}
+                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                  required
+                >
+                  <option value="">Seleccione documento</option>
+                  <option value="Cédula">Cédula</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                </select>
+              </div>
 
-            {/* Botón */}
-            <button
-              type="submit"
-              disabled={!isFormValid || loading}
-              className={`w-full p-2.5 text-xs rounded-xl font-semibold shadow-sm transform hover:scale-105 transition-all duration-200
-                ${isFormValid && !loading
-                  ? "bg-[var(--accent1)] hover:shadow-md text-[var(--bg-sec)]"
-                  : "bg-gray-400 cursor-not-allowed shadow-none text-[var(--bg-sec)]"
-                }`}
-            >
-              {loading ? (
-                <div className="flex justify-center items-center gap-1">
-                  <span>Cargando</span>
-                  {[0, 1, 2].map((i) => (
-                    <motion.span
-                      key={i}
-                      className="text-xs"
-                      animate={{ y: ["0%", "-50%", "0%"] }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      .
-                    </motion.span>
-                  ))}
+              {/* Número de tarjeta */}
+              <div>
+                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                  Número de tarjeta
+                </label>
+                <input
+                  type="text"
+                  name="cardNumber"
+                  value={formData.cardNumber}
+                  onChange={handleChange}
+                  placeholder="XXXX XXXX XXXX XXXX"
+                  maxLength={19}
+                  autoComplete="cc-number"
+                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                  required
+                />
+              </div>
+
+              {/* Fecha + CVV */}
+              <div className="grid grid-cols-3 gap-1">
+                <div className="col-span-2">
+                  <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                    Fecha de vencimiento (MM/AA)
+                  </label>
+                  <input
+                    type="text"
+                    name="expiry"
+                    value={formData.expiry}
+                    onChange={handleChange}
+                    placeholder="MM/AA"
+                    maxLength={5}
+                    autoComplete="cc-exp"
+                    className={`w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 transition ${
+                      formData.expiry && !isExpiryValid(formData.expiry)
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-[var(--line)] focus:ring-[var(--accent1)]"
+                    }`}
+                    style={{ backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                    required
+                  />
+                  {formData.expiry && !isExpiryValid(formData.expiry) && (
+                    <p className="text-red-500 text-[9px] mt-1">
+                      Fecha de vencimiento inválida o ya vencida
+                    </p>
+                  )}
                 </div>
-              ) : (
-                "Pagar"
-              )}
-            </button>
-          </form>
+
+                <div>
+                  <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                    CVV
+                  </label>
+                  <input
+                    type="text"
+                    name="cvc"
+                    value={formData.cvc}
+                    onChange={handleChange}
+                    onFocus={() => setShowCardBack(true)}
+                    onBlur={() => setShowCardBack(false)}
+                    placeholder="123"
+                    maxLength={4}
+                    autoComplete="cc-csc"
+                    className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                    style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Descripción */}
+              <div>
+                <label className="block mb-1 text-[10px] font-medium" style={{ color: "var(--titles)" }}>
+                  Descripción
+                </label>
+                <input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Ej: Pago de servicios"
+                  className="w-full p-1.5 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--accent1)] transition"
+                  style={{ borderColor: "var(--line)", backgroundColor: "var(--bg-sec)", color: "var(--titles)" }}
+                />
+              </div>
+
+              {/* Botón */}
+              <button
+                type="submit"
+                disabled={!isFormValid || loading}
+                className={`w-full p-2.5 text-xs rounded-xl font-semibold shadow-sm transform hover:scale-105 transition-all duration-200
+                  ${isFormValid && !loading
+                    ? "bg-[var(--accent1)] hover:shadow-md text-[var(--bg-sec)]"
+                    : "bg-gray-400 cursor-not-allowed shadow-none text-[var(--bg-sec)]"
+                  }`}
+              >
+                {loading ? (
+                  <div className="flex justify-center items-center gap-1">
+                    <span>Cargando</span>
+                    {[0, 1, 2].map((i) => (
+                      <motion.span
+                        key={i}
+                        className="text-xs"
+                        animate={{ y: ["0%", "-50%", "0%"] }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        .
+                      </motion.span>
+                    ))}
+                  </div>
+                ) : (
+                  "Pagar"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Pie de página */}
+      <footer className="py-4 border-t flex flex-col items-center gap-2 text-xs" 
+              style={{ borderColor: "var(--line)", color: "var(--titles)" }}>
+          <div className="flex gap-6 items-center">
+            <a href="/politica-privacidad" className="flex items-center gap-1 hover:underline"> 
+            <Lock className="w-4 h-4 text-green-600" />
+            <span>Política de Privacidad</span> </a> 
+            <a href="/terminos-condiciones" className="flex items-center gap-1 hover:underline"> 
+            <ShieldCheck className="w-4 h-4 text-blue-600" /> 
+            <span>Términos y Condiciones</span> </a>
+          </div>
+      </footer>
+    </div>
   );
 }
+
