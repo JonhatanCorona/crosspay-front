@@ -6,7 +6,6 @@ import { formatCardNumber, formatExpiry, isExpiryValid } from "../../utils/card-
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { sendPayment } from "@/helpers/payment-api";
-import { useRouter } from "next/navigation";
 import { Lock, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
@@ -22,7 +21,6 @@ type FormData = {
 };
 
 export default function PaymentForm() {
-  const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
     currency: "",
@@ -97,7 +95,6 @@ export default function PaymentForm() {
         cvc: "",
       });
 
-      router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error("❌ Error al procesar el pago: " + error.message);
